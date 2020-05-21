@@ -262,7 +262,7 @@ Validate a given password.
 
 Validate a form.
 
-**Type:** <code>Function<code>
+**Type:** <code>Function</code>
 
 | Name       | Type                                                 | Description                     |
 | ---------- | ---------------------------------------------------- | ------------------------------- |
