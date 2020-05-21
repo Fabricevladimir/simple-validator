@@ -6,6 +6,9 @@ A minimal JavaScript string validation library.
 
 - [Getting Started](#Getting-Started)
   - [Usage](#Usage)
+    - [Creating a Schema](#Creating-a-Schema)
+    - [Validating the property](#Validating-the-Property)
+    - [The Result](#The-result)
 - [API](#API)
   - [Schema](#Schema)
   - [PasswordSchema](#PasswordSchema)
@@ -24,43 +27,143 @@ A minimal JavaScript string validation library.
 Installation using npm:
 
 ```bash
-$ npm i --save @fabrice/simple-validator
+$ npm i --save @fabricefrancois/simple-validator
 ```
 
 ### Usage
+String validation is carried out in two steps:
+1. Create a [schema](#Schema).
+2. Validate the string.
 
-To validate a string:
-
-- create new `Schema` with the desired rules
-- call the `validate` function on the schema with the desired string and an
-  options object containing further validation configurations
+#### Creating a Schema
+To validate a property or a group of related properties, a blueprint (schema) containing the string validation rules to be tested against has to be configured. A new schema can be created or the pre-built [PasswordSchema](#PasswordSchema) may be used if the value being validated is a password. A new schema is configured as follows:
 
 ```javascript
 // CommonJs
-const Schema = require("@fabrice/simple-validator").Schema;
+const Schema = require("@fabricefrancois/simple-validator").Schema;
 
 // Using ES6
-import { Schema, PasswordSchema } from "@fabrice/simple-validator";
+import { Schema, PasswordSchema } from "@fabricefrancois/simple-validator";
 
-const options = { includeLabel: true };
-const passwordSchema = new PasswordSchema(1);
+// Schema for a single property
 const usernameSchema = new Schema()
   .min(6)
   .hasDigit()
-  .hasUppercase()
+  .hasUppercase("My custom error message")
   .label("Username");
 
-let result = passwordSchema.validate("1234", options);
-// result: { isValid: true, errors: [] }
+// Schema for multiple properties. Note the use of the custom schema 'PasswordSchema'
+const formSchema = {
+  username: new Schema().min(6),
+  password: new PasswordSchema()
+};
+```
 
-result = usernameSchema.validate("username123", options);
-// result: { isValid: false, errors: ['Username must contain an uppercase character'] };
+#### Validating the Property
+A string is validated using the rules set on its corresponding schema. 
+
+```javascript
+const usernameSchema = new Schema().min(6);
+const result = usernameSchema.validate("abc123");
+```
+
+Related properties and strings can either be validated individually or be grouped together as a form and validated at once.
+
+```javascript
+import { Schema, PasswordSchema, validateForm } from "@fabricefrancois/simple-validator";
+
+const formSchema = {
+  username: new Schema().min(6),
+  password: new PasswordSchema()
+};
+
+// Individual validation
+const result = formSchema.username.validate("abc123");
+
+// Form validation
+const form = {
+  username: "abc123",
+  password: "password"
+}
+
+const result = validateForm(form, formSchema)
+```
+
+When validating a form or single string, additional configurations can also be passed in to the validation function in the form of an [options](#ValidationOptions) object.
+
+```javascript
+const options = { includeLabel: true };
+
+// Single value
+const result = new Schema().min(6).validate("abc123", options);
+
+// Form validation
+const result = validateForm(form, formSchema, options)
+```
+
+#### The Result
+When validating a single property, the validation function returns a [PropertyValidationResult](#PropertyValidationResult) object with the result of the validation rules set in the schema.
+
+```javascript
+const usernameSchema = new Schema.min(6).hasDigit("Custom error");
+
+// Invalid string
+let result = usernameSchema.validate("abc");
+
+/*
+result: {
+  isValid: false,
+  errors: [
+    "must be at least 6 character(s) long",
+    "Custom error"
+  ]
+}
+*/
+
+// Valid string
+result = usernameSchema.validate("abc123");
+
+// result: { isValid: true, errors: [] }
+```
+
+When validating a form, a [FormValidationResult](#FormValidationResult) object is returned. It contains the validation results of all the individual properties.
+
+```javascript
+const formSchema = {
+  username: new Schema().min(6),
+  password: new Schema().hasUppercase()
+};
+
+// Invalid form
+let form = {
+  username: "abc1",
+  password: "Password"
+}
+
+const result = validateForm(form, formSchema);
+
+/*
+result: {
+  isValid: false,
+  errors: {
+    username: ["must be at least 6 character(s) long"]
+  }
+}
+*/
+
+// Valid form
+let form = {
+  username: "abc123",
+  password: "Password"
+}
+
+const result = validateForm(form, formSchema);
+
+// result: { isValid: true, errors: {} }
 ```
 
 ## API Documentation
-
 ### **Schema**
-
 Creates a new Schema with set validation rules.
 
 **Public Methods**:
