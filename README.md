@@ -126,7 +126,7 @@ result = usernameSchema.validate("abc123");
 // result: { isValid: true, errors: [] }
 ```
 
-When validating a form, a [FormValidationResult](#FormValidationResult) object is returned. It contains the validation results of all the individual properties.
+On the other hand, a [FormValidationResult](#FormValidationResult) object is returned when validating a form. It contains the validation results of all the individual properties.
 
 ```javascript
 const formSchema = {
@@ -528,3 +528,19 @@ function minimumValidator(input, value, message) {
 ```
 
 <br>
+
+## Contributing
+Feel free to submit issues and requests!
+
+1. **Fork** the project repository on Github
+2. **Clone** the repository to your local machine
+3. **Commit** changes to a new branch
+4. **Push** your changes to your Github fork
+5. Submit a **pull request** so your changes can be reviewed
+
+## Acknowledgements
+Special thanks to [Will Lambert](https://github.com/will-nemo) and [Sabien Jarmin](https://github.com/ambid17) for their help and support. This project is also supported by [oneleif](https://github.com/oneleif), an open source development team trying to develop great software.
+
+[![](https://img.shields.io/badge/oneleif-Twitter-blue.svg)](https://twitter.com/oneleifdev)
+
+[![](https://img.shields.io/badge/oneleif-YouTube-red.svg)](https://www.youtube.com/channel/UC3HN0jID38K0Vb_WChvgQmA)
